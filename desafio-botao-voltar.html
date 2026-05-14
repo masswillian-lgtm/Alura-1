@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio Alura - Botão Voltar</title>
+    <style>
+        /* --- ESTILOS CSS --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        main {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        /* Oculta todos os passos por padrão */
+        .passo {
+            display: none;
+            background-color: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Exibe apenas o passo que possui a classe ativo */
+        .passo.ativo {
+            display: block;
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-proximo {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-proximo:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-voltar {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-voltar:hover {
+            background-color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <!-- PASSO 1 (Inicia com a classe ativo) -->
+        <div class="passo ativo" id="passo-1">
+            <p>Você está na entrada de uma floresta misteriosa. O que deseja fazer?</p>
+            <button class="btn-proximo" data-proximo="passo-2">Seguir pela trilha</button>
+            <button class="btn-proximo" data-proximo="passo-3">Explorar as ruínas</button>
+        </div>
+
+        <!-- PASSO 2 -->
+        <div class="passo" id="passo-2">
+            <p>A trilha leva a uma ponte velha sobre um rio barulhento.</p>
+            <button class="btn-proximo" data-proximo="passo-4">Atravessar a ponte</button>
+            <!-- Atributo data-voltar indicando o passo anterior -->
+            <button class="btn-voltar" data-voltar="passo-1">Voltar</button>
+        </div>
+
+        <!-- PASSO 3 -->
+        <div class="passo" id="passo-3">
+            <p>Nas ruínas você encontra um baú antigo trancado por uma senha.</p>
+            <button class="btn-proximo" data-proximo="passo-5">Tentar abrir o baú</button>
+            <!-- Atributo data-voltar indicando o passo anterior -->
+            <button class="btn-voltar" data-voltar="passo-1">Voltar</button>
+        </div>
+
+        <!-- PASSO 4 (Fim da trilha da esquerda) -->
+        <div class="passo" id="passo-4">
+            <p>Parabéns! Você atravessou com segurança e encontrou o vilarejo escondido.</p>
+            <button class="btn-voltar" data-voltar="passo-2">Voltar para a ponte</button>
+        </div>
+
+        <!-- PASSO 5 (Fim da trilha da direita) -->
+        <div class="passo" id="passo-5">
+            <p>O baú tinha uma armadilha gasosa. Você precisa recuar imediatamente!</p>
+            <button class="btn-voltar" data-voltar="passo-3">Voltar para as ruínas</button>
+        </div>
+    </main>
+
+    <script>
+        // --- CÓDIGO JAVASCRIPT ---
+
+        // Seleciona todos os botões de avançar e voltar da página
+        const botoesProximo = document.querySelectorAll('.btn-proximo');
+        const botoesVoltar = document.querySelectorAll('.btn-voltar');
+
+        // Função responsável por alternar a visibilidade das divs
+        function mudarDePasso(idAlvo) {
+            // Localiza a div que está visível no momento e remove o estado ativo
+            const passoAtivoAtual = document.querySelector('.passo.ativo');
+            if (passoAtivoAtual) {
+                passoAtivoAtual.classList.remove('ativo');
+            }
+
+            // Localiza a div correspondente ao ID informado e a torna visível
+            const proximoPasso = document.getElementById(idAlvo);
+            if (proximoPasso) {
+                proximoPasso.classList.add('ativo');
+            }
+        }
+
+        // Aplica o evento de clique em todos os botões de avançar
+        botoesProximo.forEach(botao => {
+            botao.addEventListener('click', function() {
+                const proximoId = this.getAttribute('data-proximo');
+                mudarDePasso(proximoId);
+            });
+        });
+
+        // RESOLUÇÃO DO DESAFIO: Aplica o mesmo addEventListener nos botões de voltar usando 'data-voltar'
+        botoesVoltar.forEach(botao => {
+            botao.addEventListener('click', function() {
+                const anteriorId = this.getAttribute('data-voltar');
+                mudarDePasso(anteriorId);
+            });
+        });
+    </script>
+</body>
+</html>
