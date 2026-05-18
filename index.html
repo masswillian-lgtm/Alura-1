@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Segurança Alimentar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 2rem;
+        }
+        
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .quiz-header h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quiz-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar {
+            background-color: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background-color: #667eea;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .question-section {
+            display: none;
+        }
+        
+        .question-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .question-text {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .option {
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+        
+        .option:hover {
+            border-color: #667eea;
+            background-color: #f0f0ff;
+        }
+        
+        .option.selected {
+            border-color: #667eea;
+            background-color: #e8ebff;
+            font-weight: bold;
+        }
+        
+        .option.correct {
+            border-color: #4caf50;
+            background-color: #e8f5e9;
+        }
+        
+        .option.incorrect {
+            border-color: #f44336;
+            background-color: #ffebee;
+        }
+        
+        .option-label {
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        .feedback {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .feedback.show {
+            display: block;
+        }
+        
+        .feedback.correct {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            color: #2e7d32;
+        }
+        
+        .feedback.incorrect {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            color: #c62828;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: space-between;
+        }
+        
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .btn-next {
+            background-color: #667eea;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-next:hover:not(:disabled) {
+            background-color: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-next:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-back {
+            background-color: #999;
+            color: white;
+        }
+        
+        .btn-back:hover {
+            background-color: #777;
+        }
+        
+        .results {
+            text-align: center;
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .results h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        
+        .score-box {
+            background-color: #f0f0ff;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+        }
+        
+        .score-number {
+            font-size: 3rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .score-text {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .result-message {
+            font-size: 1.2rem;
+            color: #333;
+            margin: 1rem 0;
+        }
+        
+        .btn-restart {
+            background-color: #667eea;
+            color: white;
+            margin-top: 1rem;
+        }
+        
+        .btn-restart:hover {
+            background-color: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz-header">
+            <h1>🍎 Quiz - Segurança Alimentar</h1>
+            <p>Teste seus conhecimentos sobre segurança alimentar</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <!-- Pergunta 1 -->
+        <div class="question-section active" id="q1">
+            <div class="question-number">Pergunta 1 de 5</div>
+            <div class="question-text">Qual é a temperatura ideal para armazenar alimentos perecíveis na geladeira?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(1, 'a')">
+                    <span class="option-label">A)</span> Entre 0°C e 4°C
+                </div>
+                <div class="option" onclick="selectOption(1, 'b')">
+                    <span class="option-label">B)</span> Entre 10°C e 15°C
+                </div>
+            </div>
+            <div class="feedback" id="feedback1"></div>
+            <div class="buttons">
+                <button class="btn-next" onclick="nextQuestion(1)" id="btnNext1" disabled>Próxima →</button>
+            </div>
+        </div>
+        
+        <!-- Pergunta 2A (Caminho 1) -->
+        <div class="question-section" id="q2a">
+            <div class="question-number">Pergunta 2 de 5 (Caminho 1)</div>
+            <div class="question-text">Como você higieniza adequadamente frutas e verduras?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 'a')">
+                    <span class="option-label">A)</span> Lava com água corrente e sabão
+                </div>
+                <div class="option" onclick="selectOption(2, 'b')">
+                    <span class="option-label">B)</span> Apenas passa na mão rapidamente
+                </div>
+            </div>
+            <div class="feedback" id="feedback2"></div>
+            <div class="buttons">
+                <button class="btn-back" onclick="backQuestion()">← Voltar</button>
+                <button class="btn-next" onclick="nextQuestion(2)" id="btnNext2" disabled>Próxima →</button>
+            </div>
+        </div>
+        
+        <!-- Pergunta 2B (Caminho 2) -->
+        <div class="question-section" id="q2b">
+            <div class="question-number">Pergunta 2 de 5 (Caminho 2)</div>
+            <div class="question-text">Qual é o prazo máximo para consumir alimentos após abrir a embalagem?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(2, 'a')">
+                    <span class="option-label">A)</span> 1 semana
+                </div>
+                <div class="option" onclick="selectOption(2, 'b')">
+                    <span class="option-label">B)</span> Conforme indicado na embalagem ou 2-3 dias
+                </div>
+            </div>
+            <div class="feedback" id="feedback2b"></div>
+            <div class="buttons">
+                <button class="btn-back" onclick="backQuestion()">← Voltar</button>
+                <button class="btn-next" onclick="nextQuestion(2)" id="btnNext2b" disabled>Próxima →</button>
+            </div>
+        </div>
+        
+        <!-- Pergunta 3A (Continuação Caminho 1) -->
+        <div class="question-section" id="q3a">
+            <div class="question-number">Pergunta 3 de 5 (Caminho 1)</div>
+            <div class="question-text">Qual é a importância de lavar as mãos antes de preparar alimentos?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 'a')">
+                    <span class="option-label">A)</span> Eliminar bactérias e microrganismos prejudiciais
+                </div>
+                <div class="option" onclick="selectOption(3, 'b')">
+                    <span class="option-label">B)</span> Apenas por hábito, não é essencial
+                </div>
+            </div>
+            <div class="feedback" id="feedback3"></div>
+            <div class="buttons">
+                <button class="btn-back" onclick="backQuestion()">← Voltar</button>
+                <button class="btn-next" onclick="nextQuestion(3)" id="btnNext3" disabled>Próxima →</button>
+            </div>
+        </div>
+        
+        <!-- Pergunta 3B (Continuação Caminho 2) -->
+        <div class="question-section" id="q3b">
+            <div class="question-number">Pergunta 3 de 5 (Caminho 2)</div>
+            <div class="question-text">O que é contaminação cruzada?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(3, 'a')">
+                    <span class="option-label">A)</span> Transferência de bactérias de um alimento para outro
+                </div>
+                <div class="option" onclick="selectOption(3, 'b')">
+                    <span class="option-label">B)</span> Alimento que perdeu sua data de validade
+                </div>
+            </div>
+            <div class="feedback" id="feedback3b"></div>
+            <div class="buttons">
+                <button class="btn-back" onclick="backQuestion()">← Voltar</button>
+                <button class="btn-next" onclick="nextQuestion(3)" id="btnNext3b" disabled>Próxima →</button>
+            </div>
+        </div>
+        
+        <!-- Pergunta 4A (Continuação Caminho 1) -->
+        <div class="question-section" id="q4a">
+            <div class="question-number">Pergunta 4 de 5 (Caminho 1)</div>
+            <div class="question-text">Qual é a temperatura mínima para cozinhar carne de frango?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 'a')">
+                    <span class="option-label">A)</span> 75°C no centro da carne
+                </div>
+                <div class="option" onclick="selectOption(4, 'b')">
+                    <span class="option-label">B)</span> 50°C é suficiente
+                </div>
+            </div>
+            <div class="feedback" id="feedback4"></div>
+            <div class="buttons">
+                <button class="btn-back" onclick="backQuestion()">← Voltar</button>
+                <button class="btn-next" onclick="nextQuestion(4)" id="btnNext4" disabled>Próxima →</button>
+            </div>
+        </div>
+        
+        <!-- Pergunta 4B (Continuação Caminho 2) -->
+        <div class="question-section" id="q4b">
+            <div class="question-number">Pergunta 4 de 5 (Caminho 2)</div>
+            <div class="question-text">Qual alimento deve ser sempre cozido antes de consumir?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(4, 'a')">
+                    <span class="option-label">A)</span> Ovos e carnes
+                </div>
+                <div class="option" onclick="selectOption(4, 'b')">
+                    <span class="option-label">B)</span> Apenas vegetais
+                </div>
+            </div>
+            <div class="feedback" id="feedback4b"></div>
+            <div class="buttons">
+                <button class="btn-back" onclick="backQuestion()">← Voltar</button>
+                <button class="btn-next" onclick="nextQuestion(4)" id="btnNext4b" disabled>Próxima →</button>
+            </div>
+        </div>
+        
+        <!-- Pergunta 5 (Final) -->
+        <div class="question-section" id="q5">
+            <div class="question-number">Pergunta 5 de 5 (Final)</div>
+            <div class="question-text">Qual é a melhor prática para descongelar alimentos?</div>
+            <div class="options">
+                <div class="option" onclick="selectOption(5, 'a')">
+                    <span class="option-label">A)</span> Deixar à temperatura ambiente
+                </div>
+                <div class="option" onclick="selectOption(5, 'b')">
+                    <span class="option-label">B)</span> Descongelar na geladeira ou água fria
+                </div>
+            </div>
+            <div class="feedback" id="feedback5"></div>
+            <div class="buttons">
+                <button class="btn-back" onclick="backQuestion()">← Voltar</button>
+                <button class="btn-next" onclick="finishQuiz()" id="btnNext5" disabled>Finalizar Quiz →</button>
+            </div>
+        </div>
+        
+        <!-- Resultados -->
+        <div class="results" id="results">
+            <h2>Quiz Finalizado! 🎉</h2>
+            <div class="score-box">
+                <div class="score-number" id="scoreNumber">0/5</div>
+                <div class="score-text">Sua pontuação</div>
+            </div>
+            <div class="result-message" id="resultMessage"></div>
+            <button class="btn-restart" onclick="restartQuiz()">Reiniciar Quiz</button>
+        </div>
+    </div>
+    
+    <script>
+        // Dados das perguntas e respostas
+        const quizData = {
+            1: { correct: 'a', feedback_correct: 'Correto! A temperatura de 0°C a 4°C é ideal para conservar alimentos perecíveis.', feedback_incorrect: 'Incorreto! A temperatura correta é entre 0°C e 4°C.' },
+            2: { correct: 'a', feedback_correct: 'Correto! Lavar com água corrente é a forma adequada.', feedback_incorrect: 'Incorreto! Frutas e verduras devem ser lavadas com água corrente.' },
+            '2b': { correct: 'b', feedback_correct: 'Correto! Respeite a data de validade indicada.', feedback_incorrect: 'Incorreto! Geralmente é de 2-3 dias após abrir.' },
+            3: { correct: 'a', feedback_correct: 'Correto! Lavar as mãos elimina microrganismos prejudiciais.', feedback_incorrect: 'Incorreto! É essencial para a segurança alimentar.' },
+            '3b': { correct: 'a', feedback_correct: 'Correto! Contaminação cruzada é a transferência de bactérias.', feedback_incorrect: 'Incorreto! Contaminação cruzada é a transferência de bactérias entre alimentos.' },
+            4: { correct: 'a', feedback_correct: 'Correto! 75°C é a temperatura mínima segura.', feedback_incorrect: 'Incorreto! A temperatura deve ser de 75°C no mínimo.' },
+            '4b': { correct: 'a', feedback_correct: 'Correto! Ovos e carnes devem ser bem cozidos.', feedback_incorrect: 'Incorreto! Ovos e carnes devem sempre ser cozidos.' },
+            5: { correct: 'b', feedback_correct: 'Correto! Descongelar na geladeira é o método seguro.', feedback_incorrect: 'Incorreto! Deixar à temperatura ambiente favorece bactérias.' }
+        };
+        
+        let currentQuestion = 1;
+        let currentPath = null;
+        let score = 0;
+        let answers = {};
+        
+        function selectOption(question, option) {
+            const feedback = document.getElementById(`feedback${question === 2 && currentPath === 'b' ? '2b' : question === 3 && currentPath === 'b' ? '3b' : question === 4 && currentPath === 'b' ? '4b' : question}`);
+            const options = document.querySelectorAll(`#q${question === 2 && currentPath === 'b' ? '2b' : question === 3 && currentPath === 'b' ? '3b' : question === 4 && currentPath === 'b' ? '4b' : question} .option`);
+            
+            options.forEach(opt => opt.classList.remove('selected', 'correct', 'incorrect'));
+            event.currentTarget.classList.add('selected');
+            
+            const key = question === 2 && currentPath === 'b' ? '2b' : question === 3 && currentPath === 'b' ? '3b' : question === 4 && currentPath === 'b' ? '4b' : question;
+            const isCorrect = quizData[key].correct === option;
+            
+            event.currentTarget.classList.add(isCorrect ? 'correct' : 'incorrect');
+            
+            feedback.classList.add('show', isCorrect ? 'correct' : 'incorrect');
+            feedback.textContent = isCorrect ? quizData[key].feedback_correct : quizData[key].feedback_incorrect;
+            
+            if (isCorrect) score++;
+            answers[question] = option;
+            
+            document.getElementById(`btnNext${question === 2 && currentPath === 'b' ? '2b' : question === 3 && currentPath === 'b' ? '3b' : question === 4 && currentPath === 'b' ? '4b' : question}`).disabled = false;
+            
+            updateProgress();
+        }
+        
+        function nextQuestion(current) {
+            document.getElementById(`q${current === 2 && currentPath === 'b' ? '2b' : current === 3 && currentPath === 'b' ? '3b' : current === 4 && currentPath === 'b' ? '4b' : current}`).classList.remove('active');
+            
+            if (current === 1) {
+                currentPath = answers[1] === 'a' ? 'a' : 'b';
+                document.getElementById(`q${currentPath === 'a' ? '2a' : '2b'}`).classList.add('active');
+                currentQuestion = 2;
+            } else if (current === 2) {
+                document.getElementById(`q${currentPath === 'a' ? '3a' : '3b'}`).classList.add('active');
+                currentQuestion = 3;
+            } else if (current === 3) {
+                document.getElementById(`q${currentPath === 'a' ? '4a' : '4b'}`).classList.add('active');
+                currentQuestion = 4;
+            } else if (current === 4) {
+                document.getElementById('q5').classList.add('active');
+                currentQuestion = 5;
+            }
+            updateProgress();
+        }
+        
+        function backQuestion() {
+            document.querySelectorAll('.question-section.active').forEach(q => q.classList.remove('active'));
+            
+            if (currentQuestion === 2) {
+                document.getElementById('q1').classList.add('active');
+                currentQuestion = 1;
+            } else if (currentQuestion === 3) {
+                document.getElementById(`q${currentPath === 'a' ? '2a' : '2b'}`).classList.add('active');
+                currentQuestion = 2;
+            } else if (currentQuestion === 4) {
+                document.getElementById(`q${currentPath === 'a' ? '3a' : '3b'}`).classList.add('active');
+                currentQuestion = 3;
+            } else if (currentQuestion === 5) {
+                document.getElementById(`q${currentPath === 'a' ? '4a' : '4b'}`).classList.add('active');
+                currentQuestion = 4;
+            }
+            updateProgress();
+        }
+        
+        function finishQuiz() {
+            document.getElementById('q5').classList.remove('active');
+            document.getElementById('results').classList.add('show');
+            document.getElementById('scoreNumber').textContent = `${score}/5`;
+            
+            let message = '';
+            if (score === 5) message = 'Excelente! Você é um especialista em segurança alimentar! 🌟';
+            else if (score >= 4) message = 'Muito bom! Você tem bons conhecimentos sobre segurança alimentar! 👏';
+            else if (score >= 3) message = 'Bom! Continue aprendendo sobre segurança alimentar. 📚';
+            else message = 'Continue estudando para melhorar seus conhecimentos! 💪';
+            
+            document.getElementById('resultMessage').textContent = message;
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 1;
+            currentPath = null;
+            score = 0;
+            answers = {};
+            document.querySelectorAll('.question-section').forEach(q => q.classList.remove('active'));
+            document.getElementById('q1').classList.add('active');
+            document.getElementById('results').classList.remove('show');
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected', 'correct', 'incorrect'));
+            document.querySelectorAll('.feedback').forEach(fb => fb.classList.remove('show'));
+            document.querySelectorAll('button[id^="btnNext"]').forEach(btn => btn.disabled = true);
+            updateProgress();
+        }
+        
+        function updateProgress() {
+            const progress = (currentQuestion / 5) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        updateProgress();
+    </script>
+</body>
+</html>
